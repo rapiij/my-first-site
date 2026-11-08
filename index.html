@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pugna — The Oblivion Mage | Dota 2</title>
+    <!-- Дотерские шрифты с Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Reem+Kufi+Fun:wght@500;700&family=Radiance&family=Albert+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Основные стили в стиле интерфейса Dota 2 */
+        body {
+            background: radial-gradient(circle at 50% 30%, #0d1a10 0%, #060a07 70%, #020302 100%);
+            color: #b3c6be;
+            font-family: 'Albert Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Задний фон с текстурой дыма/пламени */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/home/background_dynamic.jpg') no-repeat center top;
+            background-size: cover;
+            opacity: 0.07;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin: 0;
+            text-transform: uppercase;
+            background: linear-gradient(to bottom, #ffffff 40%, #52a367 70%, #1e4d2b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(46, 179, 86, 0.4));
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: #55a86d;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(85, 168, 109, 0.5);
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1200px;
+            width: 90%;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        /* Левая панель - Карточка героя */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(16, 28, 20, 0.85) 0%, rgba(6, 12, 8, 0.95) 100%);
+            border: 2px solid #284731;
+            border-top: 2px solid #4ade80;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(46, 179, 86, 0.1);
+            border-radius: 4px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #e2f2e7;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(74, 222, 128, 0.2);
+            width: 100%;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+
+        .hero-portrait-container {
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border: 2px solid #3c6e4a;
+            box-shadow: 0 0 25px rgba(46, 179, 86, 0.3);
+            border-radius: 2px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .hero-portrait-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-portrait-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .roles {
+            font-size: 0.85rem;
+            color: #7fa88d;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .stats-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            padding: 6px 10px;
+            background: rgba(25, 41, 30, 0.3);
+            border-left: 3px solid #223c2a;
+            border-radius: 2px;
+        }
+
+        .stat-label {
+            color: #8fa397;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #e2f2e7;
+        }
+
+        .stat-value.primary {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+        }
+
+        .stat-value.strength { color: #f87171; }
+        .stat-value.agility { color: #60a5fa; }
+
+        /* Правая панель - История и способности */
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .section-box {
+            background: linear-gradient(135deg, rgba(12, 22, 16, 0.85) 0%, rgba(5, 10, 7, 0.95) 100%);
+            border: 1px solid #1f3625;
+            border-left: 4px solid #3b7a4e;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #4ade80;
+            margin-top: 0;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+        }
+
+        .history-text {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            text-align: justify;
+        }
+
+        /* Сетка способностей */
+        .abilities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ability-card {
+            background: rgba(10, 18, 13, 0.7);
+            border: 1px solid #1c3022;
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+
+        .ability-card:hover {
+            border-color: #4ade80;
+            background: rgba(14, 28, 19, 0.9);
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .ability-img-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            border: 1px solid #2d4f37;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        .ability-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ability-hotkey {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: linear-gradient(to bottom, #2b332c, #141a15);
+            color: #4ade80;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #4ade80;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 0 0 5px rgba(74, 222, 128, 0.6);
+        }
+
+        .ability-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ability-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ability-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #94a3b8;
+        }
+
+        footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 30px 0;
+            text-align: center;
+            background: #040705;
+            border-top: 1px solid #111a13;
+            font-size: 0.85rem;
+            color: #4f6356;
+            letter-spacing: 1px;
+        }
+
+        /* Адаптивность для средних и маленьких экранов */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .abilities-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pugna</h1>
+        <div class="subtitle">The Oblivion Mage</div>
+    </header>
+
+    <div class="main-container">
+        
+        <!-- Левая колонка: Характеристики -->
+        <aside class="left-panel">
+            <div class="hero-title">Nether Lord</div>
+            
+            <div class="hero-portrait-container">
+                <!-- Официальный медиа-ассет большого вертикального/горизонтального портрета Pugna -->
+                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/pugna.png" alt="Pugna Portrait">
+            </div>
+
+            <div class="roles">Ranged • Nuker • Pusher</div>
+
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span class="stat-label">Сила</span>
+                    <span class="stat-value strength">19 + 2.0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ловкость</span>
+                    <span class="stat-value agility">24 + 1.4</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Интеллект (Основной)</span>
+                    <span class="stat-value primary">24 + 5.2</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Скорость передвижения</span>
+                    <span class="stat-value">330</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Дальность атаки</span>
+                    <span class="stat-value">630</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Правая колонка: Описание и магия -->
+        <main class="right-panel">
+            
+            <!-- Блок истории -->
+            <section class="section-box">
+                <h2>История героя</h2>
+                <div class="history-text">
+                    В дебрях Вентрума, где сама реальность трещит по швам, Пугна правит своим Разрушенным королевством. 
+                    Переродившись из пепла своего прошлого воплощения прямо в детском возрасте, он мгновенно доказал 
+                    свое превосходство над другими кандидатами на престол, обратив их в прах силой Изумрудного Пламени. 
+                    Теперь его жажда хаоса и чистой магии Пустоты направлена на Поля Сражений Древних.
+                </div>
+            </section>
+
+            <!-- Блок способностей -->
+            <section class="section-box">
+                <h2>Способности</h2>
+                <div class="abilities-grid">
+                    
+                    <!-- Nether Blast -->
+                    <div class="ability-card">
+                        <div class="ability-img-wrapper">
+                            <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pugna_nether_blast.png" alt="Nether Blast">
+                            <div class="ability-hotkey">Q</div>
+                        </div>
+                        <div class="ability-info">
+                            <div class="ability-name">Nether Blast</div>
+                            <div class="ability-description">Взрывной поток изумрудной энергии из Пустоты, наносящий огромный урон по области. Также наносит повреждения строениям.</div>
+                        </div>
+                    </div>
+
+                    <!-- Decrepify -->
+                    <div class="ability-card">
+                        <div class="ability-img-wrapper">
+                            <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pugna_decrepify.png" alt="Decrepify">
+                            <div class="ability-hotkey">W</div>
+                        </div>
+                        <div class="ability-info">
+                            <div class="ability-name">Decrepify</div>
+                            <div class="ability-description">Погружает цель в эфирное состояние. Жертва замедляется и получает повышенный магический урон, но становится невосприимчива к физическим атакам.</div>
+                        </div>
+                    </div>
+
+                    <!-- Nether Ward -->
+                    <div class="ability-card">
+                        <div class="ability-img-wrapper">
+                            <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pugna_nether_ward.png" alt="Nether Ward">
+                            <div class="ability-hotkey">E</div>
+                        </div>
+                        <div class="ability-info">
+                            <div class="ability-name">Nether Ward</div>
+                            <div class="ability-description">Призывает тотем преисподней, который бьет током любого вражеского героя, решившего сотворить заклинание. Сила удара зависит от маны.</div>
+                        </div>
+                    </div>
+
+                    <!-- Life Drain -->
+                    <div class="ability-card">
+                        <div class="ability-img-wrapper">
+                            <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pugna_life_drain.png" alt="Life Drain">
+                            <div class="ability-hotkey">R</div>
+                        </div>
+                        <div class="ability-info">
+                            <div class="ability-name">Life Drain</div>
+                            <div class="ability-description">Поддерживаемое заклинание, высасывающее жизненную силу из врага и передающее её Пугне. Может применяться на союзников.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer>
+        © 2026 Неофициальная страница Pugna. Дизайн вдохновлен оригинальным интерфейсом Dota 2 Dashboard.
+    </footer>
+
+</body>
+</html>
